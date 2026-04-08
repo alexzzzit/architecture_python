@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     zlib1g-dev \
     libpoco-dev \
+    libpq-dev \
     libgtest-dev \
     ninja-build \
     ca-certificates \
@@ -31,6 +32,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     zlib1g-dev \
     libpoco-dev \
+    libpq5 \
     curl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/* \

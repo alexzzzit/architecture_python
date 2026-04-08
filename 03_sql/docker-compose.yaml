@@ -1,4 +1,27 @@
 services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: medical-postgres
+    environment:
+      POSTGRES_USER: medical_user
+      POSTGRES_PASSWORD: medical_password_2025
+      POSTGRES_DB: medical_records
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/02_data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medical_user -d medical_records"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 10s
+    networks:
+      - med-network
+    restart: unless-stopped
+
   api:
     build:
       context: .
@@ -8,6 +31,10 @@ services:
       - "8080:8080"
     environment:
       - JWT_SECRET_KEY=medical-records-secret-2025
+      - DATABASE_URL=postgresql://medical_user:medical_password_2025@postgres:5432/medical_records
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - med-network
@@ -31,3 +58,6 @@ networks:
   med-network:
     driver: bridge
     name: medical-records-network
+
+volumes:
+  postgres_data:
