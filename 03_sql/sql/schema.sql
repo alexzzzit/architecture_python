@@ -1,3 +1,4 @@
+-- Расширения
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
@@ -65,7 +66,7 @@ CREATE INDEX idx_records_patient_visit ON medical_records(patient_id, visit_date
 -- Полнотекстовый поиск по диагнозу
 CREATE INDEX idx_records_diagnosis_trgm ON medical_records USING gin(diagnosis gin_trgm_ops);
 
-
+-- ==================== ТРИГГЕРЫ ====================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN

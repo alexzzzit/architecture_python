@@ -23,6 +23,7 @@ InsuranceIntegration& InsuranceIntegration::getInstance() {
 // Проверяет действительность страховки по номеру полиса
 std::optional<InsuranceStatus> InsuranceIntegration::verifyInsurance(const std::string& insuranceNumber) {
     if (_mockMode) {
+        //возвращаем тестовые данные
         InsuranceStatus status;
         status.isValid = true;
         status.provider = "Mock Insurance Co";
@@ -37,10 +38,12 @@ std::optional<InsuranceStatus> InsuranceIntegration::verifyInsurance(const std::
     return std::nullopt;
 }
 
+// Проверяет режим работы интеграции
 bool InsuranceIntegration::isMockMode() const {
     return _mockMode;
 }
 
+// Включает или выключает mock-режим
 void InsuranceIntegration::setMockMode(bool enabled) {
     _mockMode = enabled;
     Poco::Logger::get("InsuranceIntegration").information(

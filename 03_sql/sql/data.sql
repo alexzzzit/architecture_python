@@ -1,16 +1,16 @@
 INSERT INTO users (id, login, first_name, last_name, middle_name, email, password_hash, role) VALUES
-('a0000001-0000-4000-8000-000000000001', 'doctor_smirnov', 'Иван', 'Смирнов', 'Петрович', 'smirnov@hospital.ru', '$2b$12$hash...', 'doctor'),
-('a0000001-0000-4000-8000-000000000002', 'doctor_volkova', 'Мария', 'Волкова', 'Александровна', 'volkova@hospital.ru', '$2b$12$hash...', 'doctor'),
-('a0000001-0000-4000-8000-000000000003', 'admin_kozlov', 'Алексей', 'Козлов', 'Дмитриевич', 'admin@hospital.ru', '$2b$12$hash...', 'admin'),
-('a0000001-0000-4000-8000-000000000004', 'lab_petrov', 'Сергей', 'Петров', 'Иванович', 'petrov@lab.ru', '$2b$12$hash...', 'lab_technician'),
-('a0000001-0000-4000-8000-000000000005', 'patient_ivanov', 'Дмитрий', 'Иванов', 'Сергеевич', 'ivanov@email.ru', '$2b$12$hash...', 'patient'),
-('a0000001-0000-4000-8000-000000000006', 'patient_sidorova', 'Анна', 'Сидорова', 'Михайловна', 'sidorova@email.ru', '$2b$12$hash...', 'patient'),
-('a0000001-0000-4000-8000-000000000007', 'patient_kuznetsov', 'Михаил', 'Кузнецов', 'Андреевич', 'kuznetsov@email.ru', '$2b$12$hash...', 'patient'),
-('a0000001-0000-4000-8000-000000000008', 'patient_morozova', 'Елена', 'Морозова', 'Владимировна', 'morozova@email.ru', '$2b$12$hash...', 'patient'),
-('a0000001-0000-4000-8000-000000000009', 'patient_novikov', 'Александр', 'Новиков', 'Павлович', 'novikov@email.ru', '$2b$12$hash...', 'patient'),
-('a0000001-0000-4000-8000-000000000010', 'patient_sokolova', 'Ольга', 'Соколова', 'Игоревна', 'sokolova@email.ru', '$2b$12$hash...', 'patient'),
-('a0000001-0000-4000-8000-000000000011', 'patient_lebedev', 'Павел', 'Лебедев', 'Алексеевич', 'lebedev@email.ru', '$2b$12$hash...', 'patient'),
-('a0000001-0000-4000-8000-000000000012', 'patient_pavlova', 'Татьяна', 'Павлова', 'Дмитриевна', 'pavlova@email.ru', '$2b$12$hash...', 'patient');
+('a0000001-0000-4000-8000-000000000001', 'doctor_smirnov', 'Иван', 'Смирнов', 'Петрович', 'smirnov@hospital.ru', 'password123', 'doctor'),
+('a0000001-0000-4000-8000-000000000002', 'doctor_volkova', 'Мария', 'Волкова', 'Александровна', 'volkova@hospital.ru', 'password123', 'doctor'),
+('a0000001-0000-4000-8000-000000000003', 'admin_kozlov', 'Алексей', 'Козлов', 'Дмитриевич', 'admin@hospital.ru', 'password123', 'admin'),
+('a0000001-0000-4000-8000-000000000004', 'lab_petrov', 'Сергей', 'Петров', 'Иванович', 'petrov@lab.ru', 'password123', 'lab_technician'),
+('a0000001-0000-4000-8000-000000000005', 'patient_ivanov', 'Дмитрий', 'Иванов', 'Сергеевич', 'ivanov@email.ru', 'password123', 'patient'),
+('a0000001-0000-4000-8000-000000000006', 'patient_sidorova', 'Анна', 'Сидорова', 'Михайловна', 'sidorova@email.ru', 'password123', 'patient'),
+('a0000001-0000-4000-8000-000000000007', 'patient_kuznetsov', 'Михаил', 'Кузнецов', 'Андреевич', 'kuznetsov@email.ru', 'password123', 'patient'),
+('a0000001-0000-4000-8000-000000000008', 'patient_morozova', 'Елена', 'Морозова', 'Владимировна', 'morozova@email.ru', 'password123', 'patient'),
+('a0000001-0000-4000-8000-000000000009', 'patient_novikov', 'Александр', 'Новиков', 'Павлович', 'novikov@email.ru', 'password123', 'patient'),
+('a0000001-0000-4000-8000-000000000010', 'patient_sokolova', 'Ольга', 'Соколова', 'Игоревна', 'sokolova@email.ru', 'password123', 'patient'),
+('a0000001-0000-4000-8000-000000000011', 'patient_lebedev', 'Павел', 'Лебедев', 'Алексеевич', 'lebedev@email.ru', 'password123', 'patient'),
+('a0000001-0000-4000-8000-000000000012', 'patient_pavlova', 'Татьяна', 'Павлова', 'Дмитриевна', 'pavlova@email.ru', 'password123', 'patient');
 
 INSERT INTO patients (id, user_id, birth_date, phone, policy_number, snils, address) VALUES
 ('b0000001-0000-4000-8000-000000000001', 'a0000001-0000-4000-8000-000000000005', '1985-03-15', '+79161234567', '1234567890123456', '123-456-789 00', 'г. Москва, ул. Ленина, 10'),

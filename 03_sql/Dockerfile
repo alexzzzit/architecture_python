@@ -26,6 +26,7 @@ RUN mkdir -p build && cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF && \
     make -j$(nproc)
 
+# ====== RUNTIME STAGE ======
 FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
@@ -40,10 +41,13 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY --from=builder /build/build/medical_records_api /app/
+# 🔥 Копируем скомпилированный бинарник из builder
+COPY --from=builder /build/build/medical_records_api /app/medical_records_api
 
-COPY openapi.yaml /app/
+# Копируем openapi.yaml для Swagger
+COPY openapi.yaml /app/openapi.yaml
 
+# Создаём пользователя для безопасности
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
@@ -51,4 +55,5 @@ USER appuser
 
 EXPOSE 8080
 
-CMD ["./medical_records_api"]
+# 🔥 ЗАПУСКАЕМ БИНАРНИК (не echo!)
+CMD ["/app/medical_records_api"]

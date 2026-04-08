@@ -4,7 +4,6 @@
 
 namespace services {
 
-// Определение статического члена (обязательно!)
 UserService* UserService::instance_ = nullptr;
 
 UserService& UserService::getInstance() {
@@ -29,7 +28,6 @@ std::vector<models::User> UserService::searchByName(const std::string& firstName
     return integrations::postgres::UserRepository::searchByName(firstName, lastName, dbUrl);
 }
 
-// 🔧 ПРОСТАЯ ПРОВЕРКА ПАРОЛЯ — прямое сравнение для демо
 bool UserService::validatePassword(const models::User& user, const std::string& password) {
     return user.passwordHash == password;
 }
