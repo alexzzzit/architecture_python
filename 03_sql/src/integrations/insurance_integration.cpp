@@ -6,8 +6,6 @@
 namespace integrations {
 
 // Конструктор инициализирует настройки интеграции
-// Получает базовый URL из переменной окружения INSURANCE_API_URL
-// По умолчанию работает в mock-режиме для демонстрации
 InsuranceIntegration::InsuranceIntegration() 
     : _mockMode(true)
     , _baseUrl(Poco::Environment::get("INSURANCE_API_URL", "https://insurance.example.com/api"))
@@ -23,11 +21,8 @@ InsuranceIntegration& InsuranceIntegration::getInstance() {
 }
 
 // Проверяет действительность страховки по номеру полиса
-// insuranceNumber: номер страхового полиса пациента
-// Возвращает: InsuranceStatus если проверка успешна, иначе nullopt
 std::optional<InsuranceStatus> InsuranceIntegration::verifyInsurance(const std::string& insuranceNumber) {
     if (_mockMode) {
-        // Mock-режим: возвращаем тестовые данные
         InsuranceStatus status;
         status.isValid = true;
         status.provider = "Mock Insurance Co";
@@ -38,17 +33,14 @@ std::optional<InsuranceStatus> InsuranceIntegration::verifyInsurance(const std::
         return status;
     }
     
-    // TODO: Реальный HTTP вызов к внешней системе страховки
     Poco::Logger::get("InsuranceIntegration").warning("Real insurance verification not implemented");
     return std::nullopt;
 }
 
-// Проверяет режим работы интеграции
 bool InsuranceIntegration::isMockMode() const {
     return _mockMode;
 }
 
-// Включает или выключает mock-режим
 void InsuranceIntegration::setMockMode(bool enabled) {
     _mockMode = enabled;
     Poco::Logger::get("InsuranceIntegration").information(
