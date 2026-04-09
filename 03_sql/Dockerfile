@@ -10,20 +10,18 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libpoco-dev \
     libpq-dev \
-    libgtest-dev \
-    ninja-build \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
+# 🔧 Копируем только нужное (без tests/)
 COPY includes/ ./includes/
 COPY src/ ./src/
-COPY tests/ ./tests/
 COPY CMakeLists.txt ./CMakeLists.txt
 
 RUN mkdir -p build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release && \
     make -j$(nproc)
 
 # ====== RUNTIME STAGE ======
@@ -34,17 +32,14 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libpoco-dev \
     libpq5 \
-    curl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
 WORKDIR /app
 
-# 🔥 Копируем скомпилированный бинарник из builder
+# 🔥 Копируем скомпилированный бинарник
 COPY --from=builder /build/build/medical_records_api /app/medical_records_api
-
-# Копируем openapi.yaml для Swagger
 COPY openapi.yaml /app/openapi.yaml
 
 # Создаём пользователя для безопасности
@@ -55,5 +50,5 @@ USER appuser
 
 EXPOSE 8080
 
-# 🔥 ЗАПУСКАЕМ БИНАРНИК (не echo!)
+# 🔥 Запускаем API
 CMD ["/app/medical_records_api"]
