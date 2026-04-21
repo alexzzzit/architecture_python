@@ -77,7 +77,6 @@ FROM ubuntu:24.04 AS runner
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Только минимальные системные библиотеки (POCO уже статически залинкован)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     libssl3 \
@@ -87,6 +86,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && ldconfig
 
 COPY --from=app-builder /build/app/build/medical_server /usr/local/bin/
+COPY openapi.yaml /app/openapi.yaml
 
 ENV PORT=8080
 ENV LOG_LEVEL=information
@@ -94,6 +94,8 @@ ENV JWT_SECRET=change-me-in-production
 ENV MONGO_HOST=mongodb
 ENV MONGO_PORT=27017
 ENV MONGO_DATABASE=medical_db
+
+WORKDIR /app
 
 EXPOSE 8080
 
