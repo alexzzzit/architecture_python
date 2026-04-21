@@ -1,5 +1,6 @@
 #pragma once
 #include "models/user.h"
+#include "models/requests.h"
 #include <optional>
 #include <vector>
 #include <string>

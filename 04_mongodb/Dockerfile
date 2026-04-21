@@ -1,49 +1,100 @@
-FROM ubuntu:22.04 AS builder
+# =============================================================================
+# Stage 1: Сборка POCO статически
+# =============================================================================
+FROM ubuntu:24.04 AS poco-builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
-    git \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     cmake \
-    g++ \
-    libssl-dev \
-    zlib1g-dev \
-    libpoco-dev \
-    libpq-dev \
+    git \
     ca-certificates \
+    libssl-dev \
+    libsasl2-dev \
+    zlib1g-dev \
+    libexpat1-dev \
     && rm -rf /var/lib/apt/lists/*
 
+ARG POCO_VERSION=1.13.0
 WORKDIR /build
 
-COPY includes/ ./includes/
-COPY src/ ./src/
-COPY CMakeLists.txt ./CMakeLists.txt
+RUN git clone --depth 1 --branch poco-${POCO_VERSION}-release https://github.com/pocoproject/poco.git
 
-RUN mkdir -p build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release && \
-    make -j$(nproc)
+WORKDIR /build/poco
+RUN mkdir cmake-build && cd cmake-build \
+    && cmake .. \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DPOCO_STATIC=ON \
+        -DPOCO_UNBUNDLED=OFF \
+        -DENABLE_MONGODB=OFF \
+        -DENABLE_NETSSL=ON \
+        -DENABLE_CRYPTO=ON \
+        -DENABLE_JWT=ON \
+        -DENABLE_DATA=OFF \
+        -DENABLE_DATA_MYSQL=OFF \
+        -DENABLE_DATA_POSTGRESQL=OFF \
+        -DENABLE_DATA_ODBC=OFF \
+        -DENABLE_REDIS=OFF \
+    && cmake --build . --target install -j$(nproc) \
+    && rm -rf /build/poco/cmake-build
 
-FROM ubuntu:22.04
+# =============================================================================
+# Stage 2: Сборка приложения
+# =============================================================================
+FROM ubuntu:24.04 AS app-builder
 
-RUN apt-get update && apt-get install -y \
-    libssl-dev \
-    zlib1g-dev \
-    libpoco-dev \
-    libpq5 \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    git \
     ca-certificates \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=poco-builder /usr/local /usr/local
+
+WORKDIR /build/app
+COPY CMakeLists.txt ./
+COPY includes ./includes/
+COPY src ./src/
+COPY configs ./configs/
+
+RUN mkdir build && cd build \
+    && cmake .. \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_PREFIX_PATH=/usr/local \
+        -DBUILD_SHARED_LIBS=OFF \
+    && cmake --build . -j$(nproc)
+
+# =============================================================================
+# Stage 3: Минимальный рантайм
+# =============================================================================
+FROM ubuntu:24.04 AS runner
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Только минимальные системные библиотеки (POCO уже статически залинкован)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libssl3 \
+    zlib1g \
+    libexpat1 \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    && ldconfig
 
-WORKDIR /app
+COPY --from=app-builder /build/app/build/medical_server /usr/local/bin/
 
-COPY --from=builder /build/build/medical_records_api /app/medical_records_api
-COPY openapi.yaml /app/openapi.yaml
-
-RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
-
-USER appuser
+ENV PORT=8080
+ENV LOG_LEVEL=information
+ENV JWT_SECRET=change-me-in-production
+ENV MONGO_HOST=mongodb
+ENV MONGO_PORT=27017
+ENV MONGO_DATABASE=medical_db
 
 EXPOSE 8080
 
-CMD ["/app/medical_records_api"]
+CMD ["medical_server"]

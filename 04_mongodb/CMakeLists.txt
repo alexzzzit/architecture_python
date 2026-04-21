@@ -1,28 +1,47 @@
-cmake_minimum_required(VERSION 3.15)
-project(MedicalRecordsAPI VERSION 1.0.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.16)
+project(medical_server VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Poco REQUIRED COMPONENTS Net NetSSL JSON Foundation)
-find_package(PostgreSQL REQUIRED)
+# Предпочитать статические библиотеки
+set(BUILD_SHARED_LIBS OFF)
 
-file(GLOB_RECURSE LIB_SOURCES "src/*.cpp")
-list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-
-add_library(medical_lib STATIC ${LIB_SOURCES})
-
-target_include_directories(medical_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includes)
-
-target_link_libraries(medical_lib PUBLIC
-    Poco::Net
-    Poco::NetSSL
-    Poco::JSON
-    Poco::Foundation
-    PostgreSQL::PostgreSQL
+find_package(Poco REQUIRED COMPONENTS
+    Net
+    NetSSL
+    Foundation
+    Util
+    JSON
 )
 
-add_executable(medical_records_api src/main.cpp)
-target_link_libraries(medical_records_api PRIVATE medical_lib)
+add_executable(medical_server
+    src/main.cpp
+)
 
-install(TARGETS medical_records_api DESTINATION bin)
+target_include_directories(medical_server PRIVATE
+    ${CMAKE_SOURCE_DIR}/includes
+)
+
+# Статическая линковка
+target_link_libraries(medical_server PRIVATE
+    Poco::Net
+    Poco::NetSSL
+    Poco::Foundation
+    Poco::Util
+    Poco::JSON
+)
+
+# Флаги для статической линковки
+target_link_options(medical_server PRIVATE
+    -static-libgcc
+    -static-libstdc++
+)
+
+target_compile_options(medical_server PRIVATE
+    -Wall
+    -Wextra
+    -pedantic
+)
+
+install(TARGETS medical_server DESTINATION bin)

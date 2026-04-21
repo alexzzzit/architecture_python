@@ -1,74 +1,38 @@
-task_processor:
-  worker_threads: 4
-
 server:
-  listener:
-    port: 8080
-    task_processor: main-task-processor
+  port: 8080
+  threads: 4
+  timeout: 30
 
-components:
-  in-memory-storage: {}
-  
-  jwt-auth-checker-component:
-    secret-key: "${JWT_SECRET_KEY:default-secret-key}"
-  
-  handler-auth-login:
-    path: /api/v1/auth/login
-    method: POST
-    
-  handler-user-create:
-    path: /api/v1/users
-    method: POST
-    
-  handler-user-search:
-    path: /api/v1/users/search
-    method: GET
-    auth:
-      types:
-        - jwt-auth-checker-component
-    
-  handler-user-get-by-login:
-    path: /api/v1/users/login/{login}
-    method: GET
-    auth:
-      types:
-        - jwt-auth-checker-component
-    
-  handler-patient-create:
-    path: /api/v1/patients
-    method: POST
-    auth:
-      types:
-        - jwt-auth-checker-component
-    
-  handler-patient-search:
-    path: /api/v1/patients/search
-    method: GET
-    auth:
-      types:
-        - jwt-auth-checker-component
-    
-  handler-record-create:
-    path: /api/v1/records
-    method: POST
-    auth:
-      types:
-        - jwt-auth-checker-component
-    
-  handler-patient-records:
-    path: /api/v1/patients/{patient_id}/records
-    method: GET
-    auth:
-      types:
-        - jwt-auth-checker-component
-    
-  handler-record-by-code:
-    path: /api/v1/records/{code}
-    method: GET
-    auth:
-      types:
-        - jwt-auth-checker-component
+logging:
+  level: information
+  format: "%Y-%m-%d %H:%M:%S.%c [%p] %t: %v"
 
-logger:
-  file_path: '@stderr'
-  level: info
+security:
+  jwt:
+    secret_env: JWT_SECRET
+    expiration_hours: 24
+
+database:
+  type: mongodb
+  mongo:
+    host_env: MONGO_HOST
+    port_env: MONGO_PORT
+    database_env: MONGO_DATABASE
+    connection_timeout_ms: 5000
+    socket_timeout_ms: 5000
+    max_pool_size: 10
+
+cache:
+  enabled: true
+  ttl_seconds: 300
+  max_entries: 1000
+
+integrations:
+  insurance:
+    enabled: false
+    endpoint: ""
+    timeout_ms: 3000
+  laboratory:
+    enabled: false
+    endpoint: ""
+    timeout_ms: 3000
