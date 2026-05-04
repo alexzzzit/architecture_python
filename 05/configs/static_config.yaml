@@ -1,0 +1,38 @@
+server:
+  port: 8080
+  threads: 4
+  timeout: 30
+
+logging:
+  level: information
+  format: "%Y-%m-%d %H:%M:%S.%c [%p] %t: %v"
+
+security:
+  jwt:
+    secret_env: JWT_SECRET
+    expiration_hours: 24
+
+database:
+  type: mongodb
+  mongo:
+    host_env: MONGO_HOST
+    port_env: MONGO_PORT
+    database_env: MONGO_DATABASE
+    connection_timeout_ms: 5000
+    socket_timeout_ms: 5000
+    max_pool_size: 10
+
+cache:
+  enabled: true
+  ttl_seconds: 300
+  max_entries: 1000
+
+integrations:
+  insurance:
+    enabled: false
+    endpoint: ""
+    timeout_ms: 3000
+  laboratory:
+    enabled: false
+    endpoint: ""
+    timeout_ms: 3000
