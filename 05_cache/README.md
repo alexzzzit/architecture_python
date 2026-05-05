@@ -7,22 +7,48 @@
 ## Цель работы
 Практическое проектирование системы с учётом производительности: реализация кеширования и rate limiting.
 
-Реализованные оптимизации
-Кеширование (Cache-Aside)
+### Сборка
+```bash
+make build
+```
 
-    Применено к GET /patients/search (TTL 300s) и GET /patients/{id}/records (TTL 120s)
-    Инвалидация выполняется синхронно при POST-запросах
-    Потокобезопасная in-memory реализация (std::unordered_map + std::mutex)
+### Запуск тестов
 
-Rate Limiting (Fixed Window Counter)
+```bash
+make test
+```
 
-    Лимиты: 60 запросов/мин для поиска, 100 для истории записей
-    При превышении возвращается 429 Too Many Requests с заголовками X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
-    Fail-open режим: при ошибке инициализации ограничения снимаются, чтобы не блокировать легитимный трафик
+### Сборка + тесты
+```bash
+make build-tests
+```
 
-Соответствие критериям
+### Очистка
+```bash
+make clean
+```
 
-    Обоснованность стратегий кеширования (Cache-Aside для read-heavy операций)
-    Корректность rate limiting (Fixed Window, HTTP 429 + заголовки)
-    Качество реализации (потокобезопасность, инвалидация, graceful degradation)
-    Анализ влияния на производительность (метрики, hit rate, защита пула соединений)
+### Открыть Swagger UI
+```
+http://localhost:8081
+```
+
+# Реализованные оптимизации
+## Кеширование (Cache-Aside)
+
+Применено к GET /patients/search (TTL 300s) и GET /patients/{id}/records (TTL 120s)
+Инвалидация выполняется синхронно при POST-запросах
+Потокобезопасная in-memory реализация (std::unordered_map + std::mutex)
+
+## Rate Limiting (Fixed Window Counter)
+
+Лимиты: 60 запросов/мин для поиска, 100 для истории записей
+При превышении возвращается 429 Too Many Requests с заголовками X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+Fail-open режим: при ошибке инициализации ограничения снимаются, чтобы не блокировать легитимный трафик
+
+## Соответствие критериям
+
+Обоснованность стратегий кеширования (Cache-Aside для read-heavy операций)
+Корректность rate limiting (Fixed Window, HTTP 429 + заголовки)
+Качество реализации (потокобезопасность, инвалидация, graceful degradation)
+Анализ влияния на производительность (метрики, hit rate, защита пула соединений)
