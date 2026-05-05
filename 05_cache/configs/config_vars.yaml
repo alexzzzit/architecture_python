@@ -1,0 +1,25 @@
+database:
+  host: ${DB_HOST:-localhost}
+  port: ${DB_PORT:-5432}
+  name: ${DB_NAME:-medical_records}
+  user: ${DB_USER:-postgres}
+  password: ${DB_PASSWORD:-postgres}
+  connection_string: "host=${DB_HOST:-localhost} port=${DB_PORT:-5432} dbname=${DB_NAME:-medical_records} user=${DB_USER:-postgres} password=${DB_PASSWORD:-postgres}"
+
+jwt:
+  secret: ${JWT_SECRET:-dev_secret_key_change_in_production_2024}
+  expiry_hours: 24
+  algorithm: HS256
+
+server:
+  port: ${API_PORT:-8080}
+  host: 0.0.0.0
+  
+logging:
+  level: info
+  format: "[%Y-%m-%d %H:%M:%S] [%l] %t"
+  
+features:
+  enable_cors: true
+  enable_rate_limiting: false
+  max_requests_per_minute: 100

@@ -1,0 +1,10 @@
+build/
+*.o
+*.a
+*.so
+.git
+.gitignore
+*.md
+*.log
+.DS_Store
+compile_commands.json
