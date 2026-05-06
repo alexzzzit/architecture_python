@@ -67,15 +67,3 @@ In-memory реализация на базе `std::unordered_map` + `std::mutex`
 | `src/cache/RateLimiter.hpp` | Fixed Window Counter: подсчёт запросов, возврат 429, заголовки |
 | [**`performance_design.md`**](./performance_design.md) | Подробное описание стратегии: анализ, метрики, формулы hit rate |
 
-> Детали по выбору стратегий, расчёту TTL и метрикам — в [**`performance_design.md`**](./performance_design.md).
-
----
-
-## Соответствие критериям
-
-- [x] Обоснованность стратегий кеширования (Cache-Aside для read-heavy операций)
-- [x] Корректность rate limiting (Fixed Window, HTTP 429 + заголовки)
-- [x] Качество реализации (потокобезопасность, инвалидация, graceful degradation)
-- [x] Анализ влияния на производительность (метрики, hit rate, защита пула соединений)
-- [x] Качество документации (`performance_design.md`, комментарии в коде, этот файл)
-```
