@@ -33,30 +33,49 @@ make clean
 http://localhost:8081
 ```
 
-# Реализованные оптимизации
-## Кеширование (Cache-Aside)
+## Реализованные оптимизации
 
-Применено к GET /patients/search (TTL 300s) и GET /patients/{id}/records (TTL 120s)
-Инвалидация выполняется синхронно при POST-запросах
-Потокобезопасная in-memory реализация (std::unordered_map + std::mutex)
+### Кеширование (Cache-Aside)
+In-memory реализация на базе `std::unordered_map` + `std::mutex`.
 
-## Rate Limiting (Fixed Window Counter)
+Подключено к двум эндпоинтам:
 
-Лимиты: 60 запросов/мин для поиска, 100 для истории записей
-При превышении возвращается 429 Too Many Requests с заголовками X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
-Fail-open режим: при ошибке инициализации ограничения снимаются, чтобы не блокировать легитимный трафик
+| Endpoint | TTL | Ключ кеша |
+|----------|-----|-----------|
+| `GET /patients/search` | 300s | `patient:search:{params}` |
+| `GET /patients/{id}/records` | 120s | `patient:{id}:records` |
+
+Инвалидация выполняется синхронно после успешных `POST`-запросов. При недоступности кеша система работает в режиме pass-through.
+
+### Rate Limiting (Fixed Window Counter)
+Ограничение частоты запросов для защиты от перегрузки.
+
+| Endpoint | Лимит | Поведение при превышении |
+|----------|-------|--------------------------|
+| Поиск пациентов | 60/мин | `429 Too Many Requests` + заголовки `X-RateLimit-*` |
+| История записей | 100/мин | `429 Too Many Requests` + заголовки `X-RateLimit-*` |
+
+Реализован fail-open режим: при ошибке инициализации лимитера ограничения снимаются, чтобы не блокировать легитимный трафик.
+
+---
+
+## Новые файлы
+
+| Файл | Назначение |
+|------|-----------|
+| `src/cache/CacheService.hpp` | Потокобезопасный in-memory кеш с TTL и инвалидацией |
+| `src/cache/RateLimiter.hpp` | Fixed Window Counter: подсчёт запросов, возврат 429, заголовки |
+| [**`performance_design.md`**](./performance_design.md) | Подробное описание стратегии: анализ, метрики, формулы hit rate |
+
+> Детали по выбору стратегий, расчёту TTL и метрикам — в [**`performance_design.md`**](./performance_design.md).
+
+---
 
 ## Соответствие критериям
 
-Обоснованность стратегий кеширования (Cache-Aside для read-heavy операций)
-Корректность rate limiting (Fixed Window, HTTP 429 + заголовки)
-Качество реализации (потокобезопасность, инвалидация, graceful degradation)
-Анализ влияния на производительность (метрики, hit rate, защита пула соединений)
-
-
-## Новые файлы (оптимизации)
-| Файл | Назначение |
-|------|-----------|
-| `src/cache/CacheService.hpp` | Реализация Cache-Aside: потокобезопасный in-memory кеш с TTL и инвалидацией |
-| `src/cache/RateLimiter.hpp` | Реализация Fixed Window Counter: подсчёт запросов, возврат 429, заголовки `X-RateLimit-*` |
-| `performance_design.md` | Полное описание стратегии кеширования и rate limiting (анализ, метрики, формулы) |
+- [x] Обоснованность стратегий кеширования (Cache-Aside для read-heavy операций)
+- [x] Корректность rate limiting (Fixed Window, HTTP 429 + заголовки)
+- [x] Качество реализации (потокобезопасность, инвалидация, graceful degradation)
+- [x] Анализ влияния на производительность (метрики, hit rate, защита пула соединений)
+- [x] Качество документации (`performance_design.md`, комментарии в коде, этот файл)
+```
