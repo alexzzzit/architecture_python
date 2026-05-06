@@ -1,4 +1,3 @@
-// src/handlers/patient_handler.cpp — проверка кеша через !cached.empty()
 #include "handlers/patient_handler.h"
 #include "auth/jwt_manager.h"
 #include "services/patient_service.h"
